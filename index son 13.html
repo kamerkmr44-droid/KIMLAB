@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEBİ Sanal Laboratuvar - 10. Sınıf Kimya</title>
+    <meta name="description" content="MEBİ Sanal Kimya Laboratuvarı — 10. Sınıf Kimyasal Tepkimeler Modülü">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #e8ecf0;
+            color: #1a202c;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ── HEADER ── */
+        header {
+            background: #001F3F;
+            color: #fff;
+            padding: 0 1.5rem;
+            height: 58px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 2px 2px 5px gray;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-logo {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .brand {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .brand em {
+            color: #5b9ef4;
+            font-style: normal;
+        }
+
+        .module-title {
+            font-size: 0.85rem;
+            opacity: 0.70;
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            padding-left: 12px;
+            margin-left: 4px;
+        }
+
+        /* ── LAYOUT ── */
+        main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ── SIDEBARS ── */
+        .sidebar {
+            background: #fff;
+            width: 255px;
+            min-width: 235px;
+            max-width: 275px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 5px 5px 10px gray;
+            z-index: 10;
+            border-right: 1px solid #dde1e7;
+        }
+
+        .sidebar-right {
+            border-right: none;
+            border-left: 1px solid #dde1e7;
+        }
+
+        .sidebar-header {
+            padding: 0.9rem 1.1rem;
+            font-weight: 700;
+            font-size: 0.78rem;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            color: #001F3F;
+            border-bottom: 1px solid #dde1e7;
+            background: #f7f8fa;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            padding: 0.9rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── CATEGORIES ── */
+        .cat-group {
+            margin-bottom: 1.1rem;
+        }
+
+        .cat-title {
+            font-size: 0.70rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #718096;
+            letter-spacing: 0.7px;
+            margin-bottom: 0.45rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cat-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #dde1e7;
+        }
+
+        /* ── BUTTONS ── */
+        .btn-lab {
+            width: 100%;
+            padding: 0.6rem 0.85rem;
+            margin-bottom: 0.3rem;
+            background: #fff;
+            border: 1px solid #dde1e7;
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-size: 0.86rem;
+            font-family: inherit;
+            color: #1a202c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 2px 2px 5px gray;
+        }
+
+        .btn-lab .ico {
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .btn-lab .fml {
+            font-family: 'Cambria Math', Georgia, serif;
+            font-size: 0.93rem;
+        }
+
+        .btn-lab:hover {
+            border-color: #0055cc;
+            color: #0055cc;
+            background: #e8f0fe;
+            transform: translateX(3px);
+            box-shadow: 2px 2px 5px gray;
+        }
+
+        .btn-lab:active {
+            transform: translateX(1px) scale(0.98);
+        }
+
+        .btn-lab.glass {
+            border-left: 3px solid #74c0fc;
+        }
+
+        .btn-lab.chem {
+            border-left: 3px solid #a9e34b;
+        }
+
+        .btn-lab.solid {
+            border-left: 3px solid #ffa94d;
+        }
+
+        .btn-lab.active-chem {
+            border-color: #27ae60;
+            background: #eafaf2;
+            color: #27ae60;
+        }
+
+        .btn-lab.ind {
+            border-left: 3px solid #e03131;
+        }
+
+        /* ── WORKSPACE ── */
+        #workspace {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: #cdd5df;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        #canvas-container canvas {
+            display: block;
+        }
+
+        /* ── REACTION POPUP ── */
+        #reaction-popup {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -20px);
+            background: rgba(10, 25, 47, 0.85);
+            color: #fff;
+            padding: 1.25rem 2rem;
+            border-radius: 12px;
+            box-shadow: 2px 2px 5px gray;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            z-index: 1000;
+        }
+
+        #reaction-popup.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+            pointer-events: auto;
+        }
+
+        #reaction-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #64ffda;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        #reaction-eq {
+            font-size: 1.8rem;
+            font-family: 'Cambria Math', Georgia, serif;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        #btn-details {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #btn-details:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: #64ffda;
+            color: #64ffda;
+        }
+
+        /* ── DETAILS MODAL ── */
+        #details-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #details-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        #details-modal {
+            background: #fff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            padding: 2rem;
+            color: #1a202c;
+            box-shadow: 5px 5px 10px gray;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        #details-overlay.show #details-modal {
+            transform: translateY(0);
+        }
+
+        #details-title {
+            font-size: 1.3rem;
+            color: #001F3F;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            border-bottom: 2px solid #e8f0fe;
+            padding-bottom: 0.5rem;
+        }
+
+        #details-content {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #4a5568;
+            margin-bottom: 1.5rem;
+        }
+
+        #btn-close-modal {
+            background: #001F3F;
+            color: #fff;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s ease;
+        }
+
+        #btn-close-modal:hover {
+            background: #003366;
+        }
+
+        /* ── HINT ── */
+        #hint {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: rgba(0, 0, 0, 0.22);
+            pointer-events: none;
+            user-select: none;
+            transition: opacity 0.4s ease;
+        }
+
+        #hint .hi {
+            font-size: 3.2rem;
+            margin-bottom: 0.4rem;
+        }
+
+        #hint .ht {
+            font-size: 0.95rem;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        /* ── RIGHT SIDEBAR CARDS ── */
+        .data-card {
+            background: #f8f9fb;
+            border-radius: 8px;
+            padding: 0.85rem 0.95rem;
+            margin-bottom: 0.65rem;
+            border-left: 4px solid #0055cc;
+            box-shadow: 2px 2px 5px gray;
+        }
+
+        .data-card.ph {
+            border-left-color: #27ae60;
+        }
+
+        .data-card.eq {
+            border-left-color: #f39c12;
+        }
+
+        .data-label {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #718096;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .data-value {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #001F3F;
+        }
+
+        .data-value.sm {
+            font-size: 0.82rem;
+            font-family: 'Cambria Math', Georgia, serif;
+            line-height: 1.4;
+        }
+
+        /* ── SELECTED CHEM BANNER ── */
+        #sel-chem {
+            background: #e8f0fe;
+            border: 1px solid #0055cc;
+            border-radius: 8px;
+            padding: 0.55rem 0.85rem;
+            margin-bottom: 0.65rem;
+            font-size: 0.80rem;
+            color: #0055cc;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 7px;
+        }
+
+        #sel-chem.on {
+            display: flex;
+        }
+
+        /* ── RESET BTN ── */
+        .btn-reset {
+            background: #c0392b;
+            color: #fff;
+            border: none;
+            padding: 0.7rem;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: 700;
+            font-size: 0.83rem;
+            cursor: pointer;
+            margin-top: auto;
+            transition: background 0.18s, transform 0.1s;
+            font-family: inherit;
+        }
+
+        .btn-reset:hover {
+            background: #a93226;
+        }
+
+        .btn-reset:active {
+            transform: scale(0.98);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 10px;
+        }
+
+        /* ── MOBILE FIRST / RESPONSIVE ── */
+        @media (max-width: 900px) {
+            main {
+                flex-direction: column;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-width: none;
+                min-width: 0;
+                height: auto;
+                /* Remove fixed heights */
+                border-right: none;
+                border-left: none;
+            }
+
+            .sidebar-header {
+                font-size: 0.72rem;
+            }
+
+            .sidebar-right {
+                order: 2;
+                /* Data right below canvas */
+            }
+
+            .sidebar:not(.sidebar-right) {
+                order: 3;
+                /* Materials at the bottom */
+                border-top: 1px solid #dde1e7;
+            }
+
+            #workspace {
+                order: 1;
+                /* Top context */
+                flex: none;
+                height: 50vh;
+                /* Fixed height so canvas doesn't disappear */
+                min-height: 400px;
+            }
+
+            .sidebar-content {
+                overflow-y: visible;
+                /* Let the main container handle scrolling */
+            }
+
+            /* Touch-Friendly Buttons */
+            .btn-lab {
+                padding: 0.85rem 1rem;
+                font-size: 0.95rem;
+            }
+
+            /* Popups */
+            #reaction-popup {
+                width: 90%;
+            }
+
+            #details-modal {
+                width: 95%;
+                max-height: 90vh;
+                overflow-y: auto;
+                padding: 1.25rem;
+            }
+
+            /* Visual Polish */
+            .header-logo {
+                display: none;
+                /* Hide logo on mobile for space */
+            }
+
+            .brand {
+                font-size: 1.05rem;
+            }
+
+            .module-title {
+                font-size: 0.75rem;
+                /* Reduce font size slightly */
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-left">
+            <div class="header-logo">⚗️</div>
+            <div class="brand">KimLab</div>
+            <div class="module-title">10. Sınıf — Kimyasal Tepkimeler Modülü</div>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- ═══ LEFT SIDEBAR ═══ -->
+        <aside class="sidebar">
+            <div class="sidebar-header">Malzemeler ve Kimyasallar</div>
+            <div class="sidebar-content">
+
+                <div class="cat-group">
+                    <span class="cat-title">Cam Malzemeler</span>
+                    <button class="btn-lab glass" id="btn-beaker">
+                        <span class="ico"></span><span>Beherglas</span>
+                    </button>
+                    <button class="btn-lab glass" id="btn-flask">
+                        <span class="ico"></span><span>Erlenmayer</span>
+                    </button>
+                </div>
+
+                <div class="cat-group">
+                    <span class="cat-title">Çözeltiler</span>
+                    <button class="btn-lab chem" id="btn-agno3" data-chem="AgNO₃" data-color="rgba(245,235,210,0.78)"
+                        data-ph="5.5" data-name="Gümüş Nitrat">
+                        <span class="ico"></span><span class="fml">AgNO₃</span>
+                    </button>
+                    <button class="btn-lab chem" id="btn-nacl" data-chem="NaCl" data-color="rgba(200,225,255,0.72)"
+                        data-ph="7.0" data-name="Sodyum Klorür">
+                        <span class="ico"></span><span class="fml">NaCl</span>
+                    </button>
+                    <button class="btn-lab chem" id="btn-hcl" data-chem="HCl" data-color="rgba(255,215,195,0.72)"
+                        data-ph="1.5" data-name="Hidroklorik Asit">
+                        <span class="ico"></span><span class="fml">HCl</span>
+                    </button>
+                    <button class="btn-lab chem" id="btn-koh" data-chem="KOH" data-color="rgba(195,215,255,0.76)"
+                        data-ph="13.5" data-name="Potasyum Hidroksit">
+                        <span class="ico"></span><span class="fml">KOH</span>
+                    </button>
+                    <button class="btn-lab chem" id="btn-hno3" data-chem="HNO₃" data-color="rgba(255,200,200,0.72)"
+                        data-ph="1.2" data-name="Nitrik Asit">
+                        <span class="ico"></span><span class="fml">HNO₃</span>
+                    </button>
+                    <button class="btn-lab chem" id="btn-nicl2" data-chem="NiCl₂" data-color="rgba(80,225,120,0.85)"
+                        data-ph="6.0" data-name="Nikel(II) Klorür">
+                        <span class="ico"></span><span class="fml">NiCl₂</span>
+                    </button>
+                    <button class="btn-lab chem" id="btn-naoh" data-chem="NaOH" data-color="rgba(220,230,250,0.70)"
+                        data-ph="13.0" data-name="Sodyum Hidroksit">
+                        <span class="ico"></span><span class="fml">NaOH</span>
+                    </button>
+                    <button class="btn-lab chem" id="btn-h2so4" data-chem="H₂SO₄" data-color="rgba(240,240,240,0.8)"
+                        data-ph="1.0" data-name="Sülfürik Asit">
+                        <span class="ico"></span><span class="fml">H₂SO₄</span>
+                    </button>
+                    <button class="btn-lab chem" id="btn-k2cro4" data-chem="K₂CrO₄" data-color="rgba(255,230,100,0.85)"
+                        data-ph="7.5" data-name="Potasyum Kromat">
+                        <span class="ico"></span><span class="fml">K₂CrO₄</span>
+                    </button>
+                </div>
+
+                <div class="cat-group">
+                    <span class="cat-title">İndikatörler</span>
+                    <button class="btn-lab ind chem" id="btn-phen" data-chem="Fenolftalein"
+                        data-color="rgba(255,255,255,0.4)" data-ph="7.0" data-name="Fenolftalein">
+                        <span class="ico"></span><span>Fenolftalein</span>
+                    </button>
+                </div>
+
+                <div class="cat-group">
+                    <span class="cat-title">Katılar</span>
+                    <button class="btn-lab solid" id="btn-al" data-solid="Al" data-name="Alüminyum">
+                        <span class="ico"></span><span>Alüminyum (Al)</span>
+                    </button>
+                    <button class="btn-lab solid" id="btn-zn" data-solid="Zn" data-name="Çinko">
+                        <span class="ico"></span><span>Çinko (Zn)</span>
+                    </button>
+                    <button class="btn-lab solid" id="btn-cu" data-solid="Cu" data-name="Bakır">
+                        <span class="ico"></span><span>Bakır (Cu)</span>
+                    </button>
+                    <button class="btn-lab solid" id="btn-mg" data-solid="Mg" data-name="Magnezyum">
+                        <span class="ico"></span><span>Magnezyum (Mg)</span>
+                    </button>
+                    <button class="btn-lab solid" id="btn-caco3" data-solid="CaCO₃" data-name="Kalsiyum Karbonat">
+                        <span class="ico"></span><span>Kalsiyum Karbonat (CaCO₃)</span>
+                    </button>
+                    <button class="btn-lab solid" id="btn-fe2o3" data-solid="Fe₂O₃" data-name="Demir(III) Oksit">
+                        <span class="ico"></span><span>Demir(III) Oksit</span>
+                    </button>
+                    <button class="btn-lab solid" id="btn-ag2s" data-solid="Ag₂S" data-name="Gümüş Sülfür">
+                        <span class="ico"></span><span>Gümüş Sülfür (Kararmış Gümüş)</span>
+                    </button>
+                    <button class="btn-lab solid" id="btn-sugar" data-solid="C₁₂H₂₂O₁₁" data-name="Sakkaroz (Şeker)">
+                        <span class="ico"></span><span>Sakkaroz (Şeker)</span>
+                    </button>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- ═══ CANVAS WORKSPACE ═══ -->
+        <section id="workspace">
+            <div id="canvas-container"></div>
+
+            <div id="reaction-popup">
+                <div id="reaction-title">Tepkime Gerçekleşti</div>
+                <div id="reaction-eq">...</div>
+                <button id="btn-details">Detaylar</button>
+            </div>
+
+            <div id="hint">
+                <div class="hi">🧫</div>
+                <div class="ht">Sol panelden malzeme ekleyin<br><small style="font-size:0.82em;opacity:0.75">Kaplara
+                        kimyasal eklemek için üzerine tıklayarak seçin.</small></div>
+            </div>
+        </section>
+
+        <!-- ═══ RIGHT SIDEBAR ═══ -->
+        <aside class="sidebar sidebar-right">
+            <div class="sidebar-header">Canlı Deney Verileri</div>
+            <div class="sidebar-content">
+
+                <div id="sel-chem"><span>🧪</span><span id="sel-name">—</span></div>
+
+                <div class="data-card">
+                    <div class="data-label">🌡️ Sıcaklık</div>
+                    <div class="data-value" id="d-temp">25.0 °C</div>
+                </div>
+                <div class="data-card ph">
+                    <div class="data-label">🔬 pH Seviyesi</div>
+                    <div class="data-value" id="d-ph">7.00</div>
+                </div>
+                <div class="data-card eq">
+                    <div class="data-label">⚗️ Aktif Tepkime Denklemi</div>
+                    <div class="data-value sm" id="d-eq">Bekleniyor...</div>
+                </div>
+
+                <button class="btn-reset" id="btn-reset">🔄 Deneyi Sıfırla</button>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- ═══ MODAL OVERLAY ═══ -->
+    <div id="details-overlay">
+        <div id="details-modal">
+            <h2 id="details-title">Tepkime Detayı</h2>
+            <div id="details-content">
+                Bu tepkime, MEB 10. Sınıf Kimya müfredatında yer alan örnek bir tepkimedir. Detaylı bilgi...
+            </div>
+            <button id="btn-close-modal">Kapat</button>
+        </div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════════
+        //   MEBİ SANAL KİMYA LABORATUVARI  ·  v2.0
+        //   p5.js + Matter.js | 10. Sınıf Kimyasal Tepkimeler Modülü
+        // ═══════════════════════════════════════════════════════════════════
+
+        // ── Reaction lookup table ────────────────────────────────────────────
+        const REACTIONS = {
+            'AgNO₃|NaCl': { eq: 'AgNO₃ + NaCl → AgCl↓ + NaNO₃', col: 'rgba(252,252,252,0.82)', ph: 5.0, T: 26, prd: 'AgCl', precip: true, detailHtml: "<b>Çökelme Tepkimesi:</b><br><br>Farklı çözeltilerin karıştırılmasıyla bir katının oluşması ve bu katının sıvı fazdan ayrılmasına çökelme, ayrılan katıya çökelek (çökelti), oluşan tepkimeye de çökelme tepkimesi denir. Ag⁺ ve Cl⁻ iyonları birleşerek suda az çözünen AgCl katısını oluşturur.<br><br><b>Net İyon Denklemi:</b><br>Ag⁺(suda) + Cl⁻(suda) → AgCl(k)" },
+            'NaCl|AgNO₃': { eq: 'AgNO₃ + NaCl → AgCl↓ + NaNO₃', col: 'rgba(252,252,252,0.82)', ph: 5.0, T: 26, prd: 'AgCl', precip: true, detailHtml: "<b>Çökelme Tepkimesi:</b><br><br>Farklı çözeltilerin karıştırılmasıyla bir katının oluşması ve bu katının sıvı fazdan ayrılmasına çökelme, ayrılan katıya çökelek (çökelti), oluşan tepkimeye de çökelme tepkimesi denir. Ag⁺ ve Cl⁻ iyonları birleşerek suda az çözünen AgCl katısını oluşturur.<br><br><b>Net İyon Denklemi:</b><br>Ag⁺(suda) + Cl⁻(suda) → AgCl(k)" },
+            'HCl|KOH': { eq: 'HCl + KOH → KCl + H₂O', col: 'rgba(195,245,200,0.76)', ph: 7.0, T: 28, prd: 'KCl + H₂O', detailHtml: "<b>Nötralleşme (Asit-Baz) Tepkimesi:</b><br><br>Arrhenius asit-baz tanımına göre suda çözündüğünde çözeltiye hidrojen iyonu veren maddeler asit, hidroksit iyonu veren maddeler ise bazdır. Sulu ortamda asitler ile bazların tepkimeye girerek tuz ve su oluşturmasına nötralleşme tepkimesi denir. Asit-baz tepkimelerinde oluşan tuz, katı olarak değil suda iyonik hâlde bulunur." },
+            'KOH|HCl': { eq: 'HCl + KOH → KCl + H₂O', col: 'rgba(195,245,200,0.76)', ph: 7.0, T: 28, prd: 'KCl + H₂O', detailHtml: "<b>Nötralleşme (Asit-Baz) Tepkimesi:</b><br><br>Arrhenius asit-baz tanımına göre suda çözündüğünde çözeltiye hidrojen iyonu veren maddeler asit, hidroksit iyonu veren maddeler ise bazdır. Sulu ortamda asitler ile bazların tepkimeye girerek tuz ve su oluşturmasına nötralleşme tepkimesi denir. Asit-baz tepkimelerinde oluşan tuz, katı olarak değil suda iyonik hâlde bulunur." },
+            'HCl|Al': { eq: '2Al + 6HCl → 2AlCl₃ + 3H₂↑', col: 'rgba(175,215,255,0.72)', ph: 3.5, T: 35, prd: 'AlCl₃ + H₂', gas: true, detailHtml: "<b>İndirgenme-Yükseltgenme Tepkimesi:</b><br><br>Asitlerin metallerle tepkimesi indirgenme-yükseltgenme tepkimelerine örnektir. Bir kimyasal tepkimede elektron alma eğilimi yüksek olan madde ile elektron verme eğilimi yüksek olan madde arasında elektron transferi olur. Alüminyum metali tepkimeye girdiğinde H₂ gazı açığa çıkar." },
+            'HCl|Cu': { eq: 'Cu + HCl → tepkime gözlenmedi', col: null, ph: null, T: null, noRxn: true, detailHtml: "<b>Tepkime Gözlenmedi:</b><br><br>Müfredat kuralları gereği bu iki madde birbiriyle karıştırıldığında standart koşullarda gözle görülür bir kimyasal tepkime (çökelme, gaz çıkışı veya nötralleşme) gerçekleşmez." },
+            'KOH|Al': { eq: 'Al + KOH + H₂O → KAlO₂ + H₂↑', col: 'rgba(185,205,255,0.76)', ph: 11.0, T: 33, prd: 'KAlO₂ + H₂', gas: true, detailHtml: "<b>İndirgenme-Yükseltgenme Tepkimesi:</b><br><br>Asitlerin metallerle tepkimesi indirgenme-yükseltgenme tepkimelerine örnektir. Bir kimyasal tepkimede elektron alma eğilimi yüksek olan madde ile elektron verme eğilimi yüksek olan madde arasında elektron transferi olur. Alüminyum metali tepkimeye girdiğinde H₂ gazı açığa çıkar." },
+            'AgNO₃|Cu': { eq: '2AgNO₃ + Cu → Cu(NO₃)₂ + 2Ag↓', col: 'rgba(145,195,255,0.76)', ph: 5.5, T: 27, prd: 'Cu(NO₃)₂ + Ag', precip: true, detailHtml: "<b>İndirgenme-Yükseltgenme (Redoks) Tepkimesi:</b><br><br>Renksiz AgNO₃ çözeltisine bakır tel daldırıldığında, çözeltideki Ag⁺ iyonları indirgenerek kızıl bakır tel etrafında gri renkli metalik gümüşü oluşturur. Bu esnada bakır teldeki metalik bakır atomları ise yükseltgenerek suya geçer ve Cu²⁺ iyonlarına dönüşür. Bakır iyonlarının hidratlaşmasıyla çözeltinin rengi maviye döner.<br><br><b>Net Tepkime:</b><br>2Ag⁺(suda) + Cu(k) → Cu²⁺(suda) + 2Ag(k)" },
+
+            // New Chemical Reactions
+            'HCl|Zn': { eq: 'Zn + 2HCl → ZnCl₂ + H₂↑', col: 'rgba(230,240,250,0.80)', ph: 4.5, T: 38, prd: 'ZnCl₂ + H₂', gas: true, detailHtml: "<b>Asit - Metal Tepkimesi ve Sınırlayıcı Bileşen:</b><br><br>Zn(k) + 2HCl(suda) → ZnCl₂(suda) + H₂(g) tepkimesine göre çinkonun tuz ruhu ile tepkimeye girmesiyle hidrojen gazı oluşur. <br><br>Tam verimle gerçekleşen tepkimeler, tepkenlerden en az birinin bittiği tepkimelerdir. Bazı kimyasal tepkimelerde tepkenler tamamen kullanılır. Bu tepkimelere artansız tepkimeler adı verilir. Eğer bir tepkimede tepkenlerden biri artıyor ise bu tepkimeye artanlı tepkime denir. Artanlı tepkimelerde biten maddeye <b>sınırlayıcı bileşen</b> adı verilir." },
+            'Zn|HCl': { eq: 'Zn + 2HCl → ZnCl₂ + H₂↑', col: 'rgba(230,240,250,0.80)', ph: 4.5, T: 38, prd: 'ZnCl₂ + H₂', gas: true, detailHtml: "<b>Asit - Metal Tepkimesi ve Sınırlayıcı Bileşen:</b><br><br>Zn(k) + 2HCl(suda) → ZnCl₂(suda) + H₂(g) tepkimesine göre çinkonun tuz ruhu ile tepkimeye girmesiyle hidrojen gazı oluşur. <br><br>Tam verimle gerçekleşen tepkimeler, tepkenlerden en az birinin bittiği tepkimelerdir. Bazı kimyasal tepkimelerde tepkenler tamamen kullanılır. Bu tepkimelere artansız tepkimeler adı verilir. Eğer bir tepkimede tepkenlerden biri artıyor ise bu tepkimeye artanlı tepkime denir. Artanlı tepkimelerde biten maddeye <b>sınırlayıcı bileşen</b> adı verilir." },
+            'HCl|CaCO₃': { eq: 'CaCO₃ + 2HCl → CaCl₂ + CO₂↑ + H₂O', col: 'rgba(235,245,255,0.75)', ph: 6.0, T: 29, prd: 'CaCl₂ + H₂O', gas: true, detailHtml: "<b>Asit - Karbonat Tepkimesi:</b><br><br>Karbonatlı bileşikler (CaCO₃ gibi) bazik özellik gösterir. Karbonatlı bileşiklerin asitlerle tepkimesi sonucu açığa çıkan CO₂ gazı da asit-baz tepkimelerinin göstergelerindendir." },
+            'CaCO₃|HCl': { eq: 'CaCO₃ + 2HCl → CaCl₂ + CO₂↑ + H₂O', col: 'rgba(235,245,255,0.75)', ph: 6.0, T: 29, prd: 'CaCl₂ + H₂O', gas: true, detailHtml: "<b>Asit - Karbonat Tepkimesi:</b><br><br>Karbonatlı bileşikler (CaCO₃ gibi) bazik özellik gösterir. Karbonatlı bileşiklerin asitlerle tepkimesi sonucu açığa çıkan CO₂ gazı da asit-baz tepkimelerinin göstergelerindendir." },
+            'HNO₃|Mg': { eq: 'Mg + 2HNO₃ → Mg(NO₃)₂ + H₂↑', col: 'rgba(240,240,240,0.85)', ph: 3.0, T: 42, prd: 'Mg(NO₃)₂ + H₂', gas: true, detailHtml: "<b>Asit - Metal Tepkimesi:</b><br><br>Aktif bir metal olan Magnezyum (Mg), asitlerle tepkimeye girdiğinde hidrojen (H₂) gazı hızla açığa çıkar ve enerji üretilir." },
+            'Mg|HNO₃': { eq: 'Mg + 2HNO₃ → Mg(NO₃)₂ + H₂↑', col: 'rgba(240,240,240,0.85)', ph: 3.0, T: 42, prd: 'Mg(NO₃)₂ + H₂', gas: true, detailHtml: "<b>Asit - Metal Tepkimesi:</b><br><br>Aktif bir metal olan Magnezyum (Mg), asitlerle tepkimeye girdiğinde hidrojen (H₂) gazı hızla açığa çıkar ve enerji üretilir." },
+            'NiCl₂|KOH': { eq: 'NiCl₂ + 2KOH → Ni(OH)₂↓ + 2KCl', col: 'rgba(165,255,185,0.70)', ph: 8.5, T: 25, prd: 'KCl', precip: true, detailHtml: "<b>Çökelme Tepkimesi:</b><br><br>NiCl₂ suda çözündüğünde çözelti yeşil renk alır. Buna kuvvetli bir baz çözeltisi ilave edildiğinde suda çözünmeyen bir katı (çökelti) oluşur." },
+            'KOH|NiCl₂': { eq: 'NiCl₂ + 2KOH → Ni(OH)₂↓ + 2KCl', col: 'rgba(165,255,185,0.70)', ph: 8.5, T: 25, prd: 'KCl', precip: true, detailHtml: "<b>Çökelme Tepkimesi:</b><br><br>NiCl₂ suda çözündüğünde çözelti yeşil renk alır. Buna kuvvetli bir baz çözeltisi ilave edildiğinde suda çözünmeyen bir katı (çökelti) oluşur." },
+
+            // 1. Asit-Baz (Nötralleşme) - Sayfa 43/44
+            'HCl|NaOH': { eq: 'HCl + NaOH → NaCl + H₂O', col: 'rgba(200,240,255,0.70)', ph: 7.0, T: 28, prd: 'NaCl + H₂O', detailHtml: "<b>Nötralleşme (Asit-Baz) Tepkimesi:</b><br><br>Hidroklorik asit çözeltisi ile sodyum hidroksit çözeltisi karıştırıldığında suda çözünmüş sodyum klorür ve su oluşur. Sulu ortamda asitler ile bazların tepkimeye girerek tuz ve su oluşturmasına nötralleşme tepkimesi denir. Asit-baz tepkimelerinde oluşan tuz, katı olarak değil suda iyonik hâlde bulunur.<br><br><b>Net İyon Denklemi:</b><br>H⁺(suda) + OH⁻(suda) → H₂O(s)" },
+            'NaOH|HCl': { eq: 'HCl + NaOH → NaCl + H₂O', col: 'rgba(200,240,255,0.70)', ph: 7.0, T: 28, prd: 'NaCl + H₂O', detailHtml: "<b>Nötralleşme (Asit-Baz) Tepkimesi:</b><br><br>Hidroklorik asit çözeltisi ile sodyum hidroksit çözeltisi karıştırıldığında suda çözünmüş sodyum klorür ve su oluşur. Sulu ortamda asitler ile bazların tepkimeye girerek tuz ve su oluşturmasına nötralleşme tepkimesi denir. Asit-baz tepkimelerinde oluşan tuz, katı olarak değil suda iyonik hâlde bulunur.<br><br><b>Net İyon Denklemi:</b><br>H⁺(suda) + OH⁻(suda) → H₂O(s)" },
+
+            // 2. Nikel(II) Klorür ve Sodyum Hidroksit Çökelmesi - Sayfa 39
+            'NiCl₂|NaOH': { eq: 'NiCl₂ + 2NaOH → Ni(OH)₂↓ + 2NaCl', col: 'rgba(120,240,160,0.60)', ph: 8.0, T: 26, prd: 'NaCl', precip: true, detailHtml: "Çökelme Tepkimesi:<br><br>NiCl₂ suda çözündüğünde çözelti yeşil renk alır. Buna NaOH çözeltisi ilave edildiğinde suda çözünmeyen beyaz/açık yeşil renkli Nikel(II) hidroksit katısı oluşur. Çökelme tepkimelerinin en belirgin göstergesi bir katı oluşumudur. Bu tepkimeler aynı zamanda çift yönlü yer değiştirme tepkimesidir." },
+            'NaOH|NiCl₂': { eq: 'NiCl₂ + 2NaOH → Ni(OH)₂↓ + 2NaCl', col: 'rgba(120,240,160,0.60)', ph: 8.0, T: 26, prd: 'NaCl', precip: true, detailHtml: "Çökelme Tepkimesi:<br><br>NiCl₂ suda çözündüğünde çözelti yeşil renk alır. Buna NaOH çözeltisi ilave edildiğinde suda çözünmeyen beyaz/açık yeşil renkli Nikel(II) hidroksit katısı oluşur. Çökelme tepkimelerinin en belirgin göstergesi bir katı oluşumudur. Bu tepkimeler aynı zamanda çift yönlü yer değiştirme tepkimesidir." },
+
+            // 3. Termit Tepkimesi (Alüminyum + Demir Oksit) - Sayfa 65
+            'Fe₂O₃|Al': { eq: '2Al + Fe₂O₃ → 2Fe + Al₂O₃ + Isı', col: 'rgba(255,100,50,0.90)', ph: null, T: 150, prd: 'Fe + Al₂O₃', detailHtml: "Termit Tepkimesi (İndirgenme-Yükseltgenme):<br><br>Alüminyum metalinin farklı bir metal oksit ile (örneğin Demir(III) Oksit) tepkimesinin özel adına termit tepkimesi denir. Bu tepkime esnasında çok yüksek miktarda ısı açığa çıkar ve demir metali erimiş hâlde elde edilir. Bu nedenle demir yolu raylarının birleştirilmesinde ve kaynakçılıkta kullanılır." },
+            'Al|Fe₂O₃': { eq: '2Al + Fe₂O₃ → 2Fe + Al₂O₃ + Isı', col: 'rgba(255,100,50,0.90)', ph: null, T: 150, prd: 'Fe + Al₂O₃', detailHtml: "Termit Tepkimesi (İndirgenme-Yükseltgenme):<br><br>Alüminyum metalinin farklı bir metal oksit ile (örneğin Demir(III) Oksit) tepkimesinin özel adına termit tepkimesi denir. Bu tepkime esnasında çok yüksek miktarda ısı açığa çıkar ve demir metali erimiş hâlde elde edilir. Bu nedenle demir yolu raylarının birleştirilmesinde ve kaynakçılıkta kullanılır." },
+
+            // 4. Gümüş Kararmasının Giderilmesi - Sayfa 74
+            'Ag₂S|Al': { eq: '3Ag₂S + 2Al + 3H₂O → 6Ag + 3H₂S + Al₂O₃', col: 'rgba(230,230,230,0.85)', ph: 6.5, T: 30, prd: 'Ag + Al₂O₃', gas: true, detailHtml: "Gümüş Kararmasının Temizlenmesi (Redoks):<br><br>Gümüş, havadaki sülfür ile tepkimeye girerek siyah renkli Ag₂S bileşiğini oluşturur. Gümüşün kararan yüzeyini temizlemek için sıcak su ve alüminyum folyoya ihtiyaç vardır. Bu maddeler kararan gümüş ile bekletilirse, Ag₂S bileşiği kimyasal bir redoks tepkimesi sonucu tekrar parlak gümüş (Ag) elementine dönüşür. Bu sırada H₂S gazı açığa çıkar." },
+            'Al|Ag₂S': { eq: '3Ag₂S + 2Al + 3H₂O → 6Ag + 3H₂S + Al₂O₃', col: 'rgba(230,230,230,0.85)', ph: 6.5, T: 30, prd: 'Ag + Al₂O₃', gas: true, detailHtml: "Gümüş Kararmasının Temizlenmesi (Redoks):<br><br>Gümüş, havadaki sülfür ile tepkimeye girerek siyah renkli Ag₂S bileşiğini oluşturur. Gümüşün kararan yüzeyini temizlemek için sıcak su ve alüminyum folyoya ihtiyaç vardır. Bu maddeler kararan gümüş ile bekletilirse, Ag₂S bileşiği kimyasal bir redoks tepkimesi sonucu tekrar parlak gümüş (Ag) elementine dönüşür. Bu sırada H₂S gazı açığa çıkar." },
+
+            // 5. Sülfürik Asit ve Şeker (Siyah Karbon Yılanı) - Sayfa 73
+            'H₂SO₄|C₁₂H₂₂O₁₁': { eq: '2H₂SO₄(s) + C₁₂H₂₂O₁₁(k) → 12C(k) + 13H₂O(g) + 2SO₂(g) + O₂(g)', col: 'rgba(20,20,20,0.95)', ph: 1.0, T: 85, prd: 'Karbon(k)', gas: true, precip: true, detailHtml: "<b>Dehidratasyon ve Redoks Tepkimesi:</b><br><br>Sülfürik asit ve sakkaroz (şeker) tepkimeye girdiğinde siyah, katı bir uzantı oluşur. Sülfürik asit kuvvetli bir nem çekicidir ve şeker molekülündeki suyu ayırır. Tepkime sonucunda su buharı ve SO₂ gazları çıkarken siyah karbon kütlesi şişerek dibe çöker." },
+            'C₁₂H₂₂O₁₁|H₂SO₄': { eq: '2H₂SO₄(s) + C₁₂H₂₂O₁₁(k) → 12C(k) + 13H₂O(g) + 2SO₂(g) + O₂(g)', col: 'rgba(20,20,20,0.95)', ph: 1.0, T: 85, prd: 'Karbon(k)', gas: true, precip: true, detailHtml: "<b>Dehidratasyon ve Redoks Tepkimesi:</b><br><br>Sülfürik asit ve sakkaroz (şeker) tepkimeye girdiğinde siyah, katı bir uzantı oluşur. Sülfürik asit kuvvetli bir nem çekicidir ve şeker molekülündeki suyu ayırır. Tepkime sonucunda su buharı ve SO₂ gazları çıkarken siyah karbon kütlesi şişerek dibe çöker." },
+
+            // 6. Gümüş Kromat Çökelmesi - Sayfa 67
+            'AgNO₃|K₂CrO₄': { eq: '2AgNO₃(suda) + K₂CrO₄(suda) → Ag₂CrO₄(k) + 2KNO₃(suda)', col: 'rgba(200,80,50,0.85)', ph: 6.5, T: 25, prd: 'KNO₃', precip: true, detailHtml: "Çökelme Tepkimesi (Gümüş Kromat):<br><br>Gıda laboratuvarlarında yemek tuzu miktarını belirlemek için çöktürme tekniği kullanılır. Gümüş nitrat, indikatör olarak ortamda bulunan potasyum kromat (K₂CrO₄) ile tepkimeye girer ve kırmızımsı kahverengi bir çökelti oluşturur. Bu sayede ortamdaki iyonların tükendiği anlaşılır." },
+            'K₂CrO₄|AgNO₃': { eq: '2AgNO₃(suda) + K₂CrO₄(suda) → Ag₂CrO₄(k) + 2KNO₃(suda)', col: 'rgba(200,80,50,0.85)', ph: 6.5, T: 25, prd: 'KNO₃', precip: true, detailHtml: "Çökelme Tepkimesi (Gümüş Kromat):<br><br>Gıda laboratuvarlarında yemek tuzu miktarını belirlemek için çöktürme tekniği kullanılır. Gümüş nitrat, indikatör olarak ortamda bulunan potasyum kromat (K₂CrO₄) ile tepkimeye girer ve kırmızımsı kahverengi bir çökelti oluşturur. Bu sayede ortamdaki iyonların tükendiği anlaşılır." },
+
+            // 7. Çapraz Asit-Baz ve Asit-Karbonat Eşleşmeleri
+            'HNO₃|KOH': { eq: 'HNO₃ + KOH → KNO₃ + H₂O', col: 'rgba(210,240,255,0.70)', ph: 7.0, T: 28, prd: 'KNO₃ + H₂O', detailHtml: "Nötralleşme (Asit-Baz) Tepkimesi:<br><br>Nitrik asit ile potasyum hidroksit karıştırıldığında potasyum nitrat (KNO₃) tuzu ve su oluşur. Asit-baz tepkimelerinde oluşan tuz, katı olarak değil suda iyonik hâlde bulunur." },
+            'KOH|HNO₃': { eq: 'HNO₃ + KOH → KNO₃ + H₂O', col: 'rgba(210,240,255,0.70)', ph: 7.0, T: 28, prd: 'KNO₃ + H₂O', detailHtml: "Nötralleşme (Asit-Baz) Tepkimesi:<br><br>Nitrik asit ile potasyum hidroksit karıştırıldığında potasyum nitrat (KNO₃) tuzu ve su oluşur. Asit-baz tepkimelerinde oluşan tuz, katı olarak değil suda iyonik hâlde bulunur." },
+            'HNO₃|CaCO₃': { eq: 'CaCO₃ + 2HNO₃ → Ca(NO₃)₂ + CO₂↑ + H₂O', col: 'rgba(235,245,255,0.75)', ph: 6.0, T: 29, prd: 'Ca(NO₃)₂ + H₂O', gas: true, detailHtml: "Asit - Karbonat Tepkimesi:<br><br>Karbonatlı bileşikler bazik özellik gösterir. Karbonatlı bileşiklerin (kireç taşı) asitlerle tepkimesi sonucu açığa çıkan CO₂ gazı da asit-baz tepkimelerinin göstergelerindendir." },
+            'CaCO₃|HNO₃': { eq: 'CaCO₃ + 2HNO₃ → Ca(NO₃)₂ + CO₂↑ + H₂O', col: 'rgba(235,245,255,0.75)', ph: 6.0, T: 29, prd: 'Ca(NO₃)₂ + H₂O', gas: true, detailHtml: "Asit - Karbonat Tepkimesi:<br><br>Karbonatlı bileşikler bazik özellik gösterir. Karbonatlı bileşiklerin (kireç taşı) asitlerle tepkimesi sonucu açığa çıkan CO₂ gazı da asit-baz tepkimelerinin göstergelerindendir." },
+
+            // Indicator logic
+            'NaOH|Fenolftalein': { eq: 'Baz + Fenolftalein → Pembe Renk', col: 'rgba(255,105,180,0.85)', ph: 13.0, T: 25, noRxn: true, detailHtml: "<b>İndikatör (Ayıraç) Etkisi:</b><br><br>Fenolftalein bir indikatördür. Bazik ortamlarda (NaOH gibi) pembe renk alırken, asidik ortamlarda renksiz kalır." },
+            'Fenolftalein|NaOH': { eq: 'Baz + Fenolftalein → Pembe Renk', col: 'rgba(255,105,180,0.85)', ph: 13.0, T: 25, noRxn: true, detailHtml: "<b>İndikatör (Ayıraç) Etkisi:</b><br><br>Fenolftalein bir indikatördür. Bazik ortamlarda (NaOH gibi) pembe renk alırken, asidik ortamlarda renksiz kalır." },
+            'HNO₃|Fenolftalein': { eq: 'Asit + Fenolftalein → Renksiz', col: 'rgba(255,255,255,0.4)', ph: 1.2, T: 25, noRxn: true, detailHtml: "<b>İndikatör (Ayıraç) Etkisi:</b><br><br>Fenolftalein asidik ortamlarda (HNO₃ gibi) renksiz kalır." },
+            'Fenolftalein|HNO₃': { eq: 'Asit + Fenolftalein → Renksiz', col: 'rgba(255,255,255,0.4)', ph: 1.2, T: 25, noRxn: true, detailHtml: "<b>İndikatör (Ayıraç) Etkisi:</b><br><br>Fenolftalein asidik ortamlarda (HNO₃ gibi) renksiz kalır." },
+            'KOH|Fenolftalein': { eq: 'Baz + Fenolftalein → Pembe Renk (Tepkime Yok)', col: 'rgba(255,105,180,0.85)', ph: 13.5, T: 25, noRxn: true, detailHtml: "<b>İndikatör (Ayıraç) Etkisi:</b><br><br>Fenolftalein bir indikatördür. Asit-baz tepkimelerinde ortamın pH durumunu tespit etmek için kullanılır. Bazik ortamlarda pembe renk alırken, asidik ortamlarda renksiz kalır." },
+            'Fenolftalein|KOH': { eq: 'Baz + Fenolftalein → Pembe Renk (Tepkime Yok)', col: 'rgba(255,105,180,0.85)', ph: 13.5, T: 25, noRxn: true, detailHtml: "<b>İndikatör (Ayıraç) Etkisi:</b><br><br>Fenolftalein bir indikatördür. Asit-baz tepkimelerinde ortamın pH durumunu tespit etmek için kullanılır. Bazik ortamlarda pembe renk alırken, asidik ortamlarda renksiz kalır." },
+            'HCl|Fenolftalein': { eq: 'Asit + Fenolftalein → Renksiz (Tepkime Yok)', col: 'rgba(255,255,255,0.4)', ph: 1.5, T: 25, noRxn: true, detailHtml: "<b>İndikatör (Ayıraç) Etkisi:</b><br><br>Fenolftalein bir indikatördür. Asit-baz tepkimelerinde ortamın pH durumunu tespit etmek için kullanılır. Bazik ortamlarda pembe renk alırken, asidik ortamlarda renksiz kalır." },
+            'Fenolftalein|HCl': { eq: 'Asit + Fenolftalein → Renksiz (Tepkime Yok)', col: 'rgba(255,255,255,0.4)', ph: 1.5, T: 25, noRxn: true, detailHtml: "<b>İndikatör (Ayıraç) Etkisi:</b><br><br>Fenolftalein bir indikatördür. Asit-baz tepkimelerinde ortamın pH durumunu tespit etmek için kullanılır. Bazik ortamlarda pembe renk alırken, asidik ortamlarda renksiz kalır." }
+        };
+
+        // ── Lab state ────────────────────────────────────────────────────────
+        const LAB = { vessels: [], count: 0, selectedBeaker: null };
+
+        // ── p5.js Sketch ─────────────────────────────────────────────────────
+        const sketch = p => {
+            p.setup = () => {
+                const el = document.getElementById('canvas-container');
+                const cnv = p.createCanvas(el.offsetWidth, el.offsetHeight);
+                cnv.parent('canvas-container');
+            };
+
+            p.draw = () => {
+                drawBG();
+                for (let i = 0; i < LAB.vessels.length; i++) {
+                    drawVessel(LAB.vessels[i]);
+                }
+
+                const hint = document.getElementById('hint');
+                if (hint) hint.style.opacity = LAB.vessels.length > 0 ? '0' : '1';
+            };
+
+            function drawBG() {
+                p.noStroke();
+                // Duvar (Wall)
+                p.fill('#d8e2ed');
+                p.rect(0, 0, p.width, p.height * 0.72);
+                // Masa (Bench)
+                p.fill('#c2b9aa');
+                p.rect(0, p.height * 0.72, p.width, p.height * 0.28);
+                // Masa Kenarı (Bench Edge)
+                p.fill('#a9a099');
+                p.rect(0, p.height * 0.72, p.width, 5);
+            }
+
+            function drawVessel(v) {
+                // Seçiliyse sarı çerçeve
+                if (LAB.selectedBeaker && LAB.selectedBeaker.id === v.id) {
+                    p.noFill();
+                    p.stroke('#FFD700');
+                    p.strokeWeight(4);
+                    p.rect(v.x - 5, v.y - 5, v.w + 10, v.h + 10);
+                }
+
+                // Cam Kap
+                p.stroke('#7ab8d8');
+                p.strokeWeight(3);
+                p.noFill();
+                p.line(v.x, v.y, v.x, v.y + v.h); // sol duvar
+                p.line(v.x + v.w, v.y, v.x + v.w, v.y + v.h); // sağ duvar
+                p.line(v.x, v.y + v.h, v.x + v.w, v.y + v.h); // alt
+
+                // Erlenmayer ise çapraz çizgiler ekleyelim
+                if (v.type === 'flask') {
+                    p.line(v.x, v.y, v.x + 20, v.y - 30);
+                    p.line(v.x + v.w, v.y, v.x + v.w - 20, v.y - 30);
+                    p.line(v.x + 20, v.y - 30, v.x + v.w - 20, v.y - 30);
+                }
+
+                p.noStroke();
+
+                // İçindeki Sıvı veya Madde
+                if (v.contents.length > 0) {
+                    const liqH = v.h * 0.6;
+                    const liqY = v.y + v.h - liqH;
+                    p.fill(v.color || 'rgba(130,195,255,0.58)');
+                    p.rect(v.x + 2, liqY, v.w - 4, liqH);
+
+                    // Baloncuklar
+                    if (v.hasGas) {
+                        p.fill('rgba(255,255,255,0.7)');
+                        for (let i = 0; i < 5; i++) {
+                            p.ellipse(p.random(v.x + 5, v.x + v.w - 5), p.random(liqY, v.y + v.h), p.random(3, 7));
+                        }
+                    }
+
+                    // Çökelti
+                    if (v.hasPrecipitate) {
+                        p.fill('gray');
+                        p.rect(v.x + 2, v.y + v.h - 15, v.w - 4, 15);
+                    }
+
+                    // Yazı
+                    p.fill('black');
+                    p.textAlign(p.CENTER, p.CENTER);
+                    p.textSize(12);
+                    p.text(v.contents.join(' + '), v.x + v.w / 2, liqY + liqH / 2);
+                }
+
+                // Beher Numarası
+                p.fill('black');
+                p.textSize(10);
+                p.text('#' + v.id, v.x + v.w / 2, v.y + v.h + 15);
+            }
+
+            p.mousePressed = () => {
+                for (let i = 0; i < LAB.vessels.length; i++) {
+                    let v = LAB.vessels[i];
+                    // Basit kutu çarpışması
+                    if (p.mouseX > v.x && p.mouseX < v.x + v.w && p.mouseY > v.y - 30 && p.mouseY < v.y + v.h) {
+                        LAB.selectedBeaker = v;
+                        break;
+                    }
+                }
+            };
+
+            p.windowResized = () => {
+                const el = document.getElementById('canvas-container');
+                if (el) {
+                    p.resizeCanvas(el.offsetWidth, el.offsetHeight);
+                    arrangeVessels();
+                }
+            };
+        };
+
+        const labP5 = new p5(sketch);
+
+        // ═════════════════════════════════════════════════════════════════════
+        //  KAP EKLEME (Basit Array)
+        // ═════════════════════════════════════════════════════════════════════
+        function spawnVessel(type) {
+            if (LAB.vessels.length >= 3) {
+                alert("Maksimum kap sayısına (3) ulaştınız.");
+                return;
+            }
+
+            LAB.count++;
+
+            let w = type === 'beaker' ? 100 : 80;
+            let h = type === 'beaker' ? 140 : 150;
+
+            let vessel = {
+                id: LAB.count,
+                type: type,
+                x: 0,
+                y: 0,
+                w: w,
+                h: h,
+                contents: [],
+                color: null,
+                hasGas: false,
+                hasPrecipitate: false
+            };
+
+            LAB.vessels.push(vessel);
+            LAB.selectedBeaker = vessel;
+            arrangeVessels();
+        }
+
+        // Kapları masaya yan yana diz
+        function arrangeVessels() {
+            const el = document.getElementById('canvas-container');
+            if (!el) return;
+            const W = el.offsetWidth;
+            const H = el.offsetHeight;
+            const benchY = H * 0.72;
+
+            const count = LAB.vessels.length;
+            if (count === 0) return;
+
+            const gap = W / (count + 1);
+
+            for (let i = 0; i < count; i++) {
+                let v = LAB.vessels[i];
+                v.x = gap * (i + 1) - (v.w / 2);
+                v.y = benchY - v.h;
+            }
+        }
+
+        // ═════════════════════════════════════════════════════════════════════
+        //  CHEMICAL / SOLID INTERACTIONS
+        // ═════════════════════════════════════════════════════════════════════
+        function addChemical(cd) {
+            const v = LAB.selectedBeaker;
+            if (!v) { return; }
+
+            v.contents.push(cd.chem);
+            v.color = cd.color || v.color;
+            v.hasGas = false;
+            v.hasPrecipitate = false;
+
+            document.getElementById('d-ph').textContent = parseFloat(cd.ph).toFixed(2);
+            document.getElementById('d-eq').textContent = `${cd.chem} çözeltisi eklendi.`;
+
+            checkReaction(v);
+        }
+
+        function addSolid(sd) {
+            const v = LAB.selectedBeaker;
+            if (!v) { return; }
+
+            v.contents.push(sd.solid);
+            console.log(`Eklendi: ${sd.solid}`);
+            document.getElementById('d-eq').textContent = `${sd.solid} eklendi.`;
+
+            checkReaction(v);
+        }
+
+        function checkReaction(v) {
+            if (v.contents.length >= 2) {
+                const len = v.contents.length;
+                const prev = v.contents[len - 2];
+                const next = v.contents[len - 1];
+                const rxn = REACTIONS[`${prev}|${next}`] || REACTIONS[`${next}|${prev}`];
+
+                if (rxn) {
+                    applyReaction(v, rxn);
+                }
+            }
+        }
+
+        function applyReaction(vessel, rxn) {
+            vessel.color = rxn.col || vessel.color;
+
+            if (!rxn.noRxn && rxn.prd) {
+                vessel.contents = [rxn.prd];
+            }
+            // If noRxn is true, display the popup but keep the contents.
+
+            vessel.hasGas = !!rxn.gas;
+            vessel.hasPrecipitate = !!rxn.precip;
+
+            if (rxn.ph != null) document.getElementById('d-ph').textContent = rxn.ph.toFixed(2);
+            if (rxn.T != null) document.getElementById('d-temp').textContent = rxn.T.toFixed(1) + ' °C';
+            document.getElementById('d-eq').textContent = rxn.eq;
+
+            showReactionPopup(rxn.eq, rxn.detailHtml);
+        }
+
+        // ═════════════════════════════════════════════════════════════════════
+        //  UI HELPERS
+        // ═════════════════════════════════════════════════════════════════════
+        let reactionTimeout;
+        let activeReactionText = "";
+
+        function showReactionPopup(equation, detailText) {
+            const popup = document.getElementById('reaction-popup');
+            document.getElementById('reaction-eq').textContent = equation;
+            activeReactionText = detailText || `Bu tepkime: ${equation}\n\nDetaylı bilgi bulunmamaktadır.`;
+
+            popup.classList.add('show');
+
+            clearTimeout(reactionTimeout);
+            reactionTimeout = setTimeout(() => {
+                popup.classList.remove('show');
+            }, 10000); // Increased to 10 seconds
+        }
+
+        function resetLab() {
+            LAB.vessels = [];
+            LAB.count = 0;
+            LAB.selectedBeaker = null;
+
+            document.getElementById('d-temp').textContent = '25.0 °C';
+            document.getElementById('d-ph').textContent = '7.00';
+            document.getElementById('d-eq').textContent = 'Bekleniyor...';
+            document.getElementById('sel-chem').classList.remove('on');
+            document.querySelectorAll('.btn-lab').forEach(b => b.classList.remove('active-chem'));
+            document.getElementById('reaction-popup').classList.remove('show');
+        }
+
+        // ═════════════════════════════════════════════════════════════════════
+        //  EVENT LISTENERS
+        // ═════════════════════════════════════════════════════════════════════
+        document.addEventListener('DOMContentLoaded', () => {
+
+            document.getElementById('btn-beaker').addEventListener('click', () => spawnVessel('beaker'));
+            document.getElementById('btn-flask').addEventListener('click', () => spawnVessel('flask'));
+
+            document.querySelectorAll('.btn-lab.chem').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.btn-lab.chem').forEach(b => b.classList.remove('active-chem'));
+                    btn.classList.add('active-chem');
+
+                    const cd = {
+                        chem: btn.dataset.chem,
+                        color: btn.dataset.color,
+                        ph: btn.dataset.ph,
+                        name: btn.dataset.name,
+                    };
+
+                    const sel = document.getElementById('sel-chem');
+                    document.getElementById('sel-name').textContent = `Seçili: ${cd.name} (${cd.chem})`;
+                    sel.classList.add('on');
+
+                    addChemical(cd);
+                });
+            });
+
+            document.querySelectorAll('.btn-lab.solid').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    addSolid({ solid: btn.dataset.solid, name: btn.dataset.name });
+                });
+            });
+
+            document.getElementById('btn-reset').addEventListener('click', () => {
+                if (confirm('Tüm deney nesneleri silinecek. Onaylıyor musunuz?')) resetLab();
+            });
+
+            // Modal listeners
+            document.getElementById('btn-details').addEventListener('click', () => {
+                document.getElementById('reaction-popup').classList.remove('show');
+                document.getElementById('details-content').innerHTML = activeReactionText;
+                document.getElementById('details-overlay').classList.add('show');
+            });
+
+            document.getElementById('btn-close-modal').addEventListener('click', () => {
+                document.getElementById('details-overlay').classList.remove('show');
+            });
+        });
+    </script>
+
+</body>
+
+</html>
